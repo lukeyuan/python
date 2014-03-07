@@ -1,0 +1,31 @@
+#!/bin/bash -eu
+
+# Mock cartridge for testing and verifying node platform code. This is
+# not an example of how to write a well-formed cartridge.
+
+set +u
+
+case "$1" in
+  -v|--version)
+    version="$2"
+esac
+
+function error_exit {
+  echo -e "$1\nexit $2" 
+  echo -e $1 1>&2
+  exit $2
+}
+
+if [[ -n "$version" ]]; then
+  echo "Creating version marker for $version"
+
+else
+  echo "Skipping version creation marker."
+fi
+
+cp -r $OPENSHIFT_PYTHON_DIR/wsgi $OPENSHIFT_REPO_DIR/wsgi/
+if [[ -n "$DOWNLOAD_PATH" ]]; then
+wget -r -nd -np $DOWNLOAD_PATH -P $OPENSHIFT_REPO_DIR/wsgi/
+fi
+
+exit 0

@@ -1,0 +1,20 @@
+---
+Name: python 
+Cartridge-Short-Name: PYTHON
+Display-Name: App python plugin
+Description: App python plugin
+Source-Url: https://github.com/lukeyuan/python.git
+Version: '0.1'
+License: "None"
+Vendor: scnu
+Cartridge-Version: 0.0.1
+Cartridge-Vendor: luke
+Categories:
+ - embedded
+Provides:
+ - python-0.1
+ - python
+Scaling:
+  Min: 1
+  Max: 1
+

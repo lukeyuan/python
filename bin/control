@@ -1,0 +1,45 @@
+#!/bin/bash -eu
+
+set +u
+
+function fetchAll {
+  echo "do nothing"
+  }
+
+
+
+case "$1" in
+  start)         fetchAll ;;
+  stop)          fetchAll ;;
+  restart)
+	  if [[ -e "$OPENSHIFT_REPO_DIR/wsgi/dbinfo"]]; then
+		  rm $OPENSHIFT_REPO_DIR/wsgi/dbinfo
+	  fi
+	  if [[ -n "$OPENSHIFT_MYSQL_DB_USERNAME" ]]; then
+		  echo "DB mysql" >> $OPENSHIFT_REPO_DIR/wsgi/dbinfo
+		  echo "OPENSHIFT_MYSQL_DB_HOST "$OPENSHIFT_MYSQL_DB_HOST >> $OPENSHIFT_REPO_DIR/wsgi/dbinfo
+		  echo "OPENSHIFT_MYSQL_DB_USERNAME "$OPENSHIFT_MYSQL_DB_USERNAME >> $OPENSHIFT_REPO_DIR/wsgi/dbinfo
+		  echo "OPENSHIFT_MYSQL_DB_PASSWORD "$OPENSHIFT_MYSQL_DB_PASSWORD >> $OPENSHIFT_REPO_DIR/wsgi/dbinfo
+	  fi
+	  ;;
+  status)        fetchAll ;;
+  reload)        
+	  if [[ -n "$DOWNLOAD_PATH" ]]; then
+
+		  wget -N $DOWNLOAD_PATH -P $OPENSHIFT_REPO_DIR/wsgi/
+
+	  fi
+	  ;;
+  tidy)          fetchAll ;;
+  pre-build)     fetchAll ;;
+  build)         fetchAll ;;
+  deploy)        fetchAll ;;
+  post-deploy)   fetchAll ;;
+  pre-snapshot)  fetchAll ;;
+  post-snapshot) fetchAll ;;
+  pre-restore)   fetchAll ;;
+  post-restore)  fetchAll ;;
+  *)           exit 0
+esac
+
+exit 0

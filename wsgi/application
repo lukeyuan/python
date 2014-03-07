@@ -1,0 +1,44 @@
+#!/usr/bin/python
+#-*-coding:utf-8-*-
+
+import os
+
+virtenv = os.environ['OPENSHIFT_PYTHON_DIR'] + '/virtenv/'
+virtualenv = os.path.join(virtenv, 'bin/activate_this.py')
+
+try:
+    execfile(virtualenv, dict(__file__=virtualenv))
+except IOError:
+    pass
+
+#addition include below this line
+
+import sql
+
+def application(environ, start_response):
+
+    ctype = 'text/plain'
+    if environ['PATH_INFO'] == '/health':
+        response_body = 1
+    elif environ['PATH_INFO'] == '/env':
+        response_body = ['%s: %s' % (key, value)
+                for key, value in sorted(environ.items())]
+        response_body = '\n'.join(response_body)
+    else:
+        s = sql.db()
+        response_body = s.showDBMsg()
+        if response_body:
+            response_body = "nothing output"
+        else:
+            response_body = str(response_body)
+    status = '200 OK'
+    response_headers = [('Content-Type', ctype), ('Content-Length', str(len(response_body)))]
+
+    start_response(status, response_headers)
+    return [response_body]
+
+
+if __name__ == '__main__':
+    from wsgiref.simple_server import make_server
+    httpd = make_server('localhost', 8051, application)
+    httpd.handle_request()
