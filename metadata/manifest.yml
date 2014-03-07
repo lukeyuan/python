@@ -1,6 +1,6 @@
 ---
-Name: python 
-Cartridge-Short-Name: PYTHON
+Name: rawpython 
+Cartridge-Short-Name: RAWPYTHON
 Display-Name: App python plugin
 Description: App python plugin
 Source-Url: https://github.com/lukeyuan/python.git
@@ -12,8 +12,8 @@ Cartridge-Vendor: luke
 Categories:
  - embedded
 Provides:
- - python-0.1
- - python
+ - rawpython-0.1
+ - rawpython
 Scaling:
   Min: 1
   Max: 1
