@@ -12,7 +12,7 @@ case "$1" in
   start)         fetchAll ;;
   stop)          fetchAll ;;
   restart)
-	  if [[ -e "$OPENSHIFT_REPO_DIR/wsgi/dbinfo"]]; then
+	  if [[ -e "$OPENSHIFT_REPO_DIR/wsgi/dbinfo" ]]; then
 		  rm $OPENSHIFT_REPO_DIR/wsgi/dbinfo
 	  fi
 	  if [[ -n "$OPENSHIFT_MYSQL_DB_USERNAME" ]]; then
