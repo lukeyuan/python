@@ -8,7 +8,7 @@ class db():
 
     dbMsg = {}
 
-    __init__(self):
+    def __init__(self):
         if os.path.exist(BASE_PATH):
             with open(BASE_PATH, "rb") as info:
                 data = info.readlines()

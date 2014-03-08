@@ -26,7 +26,7 @@ def application(environ, start_response):
         response_body = '\n'.join(response_body)
     else:
         s = sql.db()
-        response_body = s.showDBMsg()
+        response_body = s.showDBInfo()
         if response_body:
             response_body = "nothing output"
         else:
