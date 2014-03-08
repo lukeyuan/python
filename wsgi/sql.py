@@ -9,7 +9,7 @@ class db():
     dbMsg = {}
 
     def __init__(self):
-        if os.path.exist(BASE_PATH):
+        if os.path.exists(BASE_PATH):
             with open(BASE_PATH, "rb") as info:
                 data = info.readlines()
                 for f in data:
