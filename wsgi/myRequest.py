@@ -9,7 +9,7 @@ import sql
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
-def OpenshiftHttpResquest(environ):
+def OpenshiftHttpRequest(environ):
     para = {}
     try:
         if "QUERY_STRING" in environ and environ['QUERY_STRING']:
