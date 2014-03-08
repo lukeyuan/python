@@ -14,6 +14,7 @@ except IOError:
 #addition include below this line
 
 import sql
+import myRequest
 
 def application(environ, start_response):
 
@@ -24,6 +25,10 @@ def application(environ, start_response):
         response_body = ['%s: %s' % (key, value)
                 for key, value in sorted(environ.items())]
         response_body = '\n'.join(response_body)
+    elif environ['PATH_INFO'] == '/OpenshiftHttpRequest':
+        response_body = myRequest.OpenshiftHttpRequest(environ)
+    elif environ['PATH_INFO'] == '/OpenshiftWeChatHttpRequest':
+        response_body = myRequest.OpenshiftWeChatHttpRequest(environ)
     else:
         s = sql.db()
         response_body = s.showDBInfo()
