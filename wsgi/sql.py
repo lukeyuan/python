@@ -20,4 +20,4 @@ class db():
         if self.dbMsg:
             return self.dbMsg
         else:
-            return 1
+            return 0
