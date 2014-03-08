@@ -7,7 +7,7 @@ function fetchAll {
   }
 
 
-function GetDBInfo{
+function GetDBInfo {
 	  if [[ -e "$OPENSHIFT_REPO_DIR/wsgi/dbinfo" ]]; then
 		  rm $OPENSHIFT_REPO_DIR/wsgi/dbinfo
 	  fi
@@ -17,7 +17,7 @@ function GetDBInfo{
 		  echo "OPENSHIFT_MYSQL_DB_USERNAME "$OPENSHIFT_MYSQL_DB_USERNAME >> $OPENSHIFT_REPO_DIR/wsgi/dbinfo
 		  echo "OPENSHIFT_MYSQL_DB_PASSWORD "$OPENSHIFT_MYSQL_DB_PASSWORD >> $OPENSHIFT_REPO_DIR/wsgi/dbinfo
 	  fi
-}
+ }
 
 case "$1" in
   start)         GetDBInfo ;;
