@@ -28,9 +28,9 @@ def application(environ, start_response):
         s = sql.db()
         response_body = s.showDBInfo()
         if response_body:
-            response_body = "nothing output"
-        else:
             response_body = str(response_body)
+        else:
+            response_body = "nothing output"
     status = '200 OK'
     response_headers = [('Content-Type', ctype), ('Content-Length', str(len(response_body)))]
 
