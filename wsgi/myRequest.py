@@ -30,7 +30,7 @@ def OpenshiftHttpRequest(environ):
             fields = cgi.FieldStorage(fp=environ['wsgi.input'], environ=environ, keep_blank_values=1)
             for index in fields:
                 if fields[index].filename == None: #POST数据变量
-                    para[field[index].name] = para[field[index].value]
+                    para[field[index].name] = field[index].value
                 elif fields[index].filename: #POST数据文件
                     para[field[index].name] = {'name': fields[index].filename, 'value': fields[index].value}
          
