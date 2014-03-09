@@ -29,6 +29,13 @@ def application(environ, start_response):
         response_body = myRequest.OpenshiftHttpRequest(environ)
     elif environ['PATH_INFO'] == '/OpenshiftWeChatHttpRequest':
         response_body = myRequest.OpenshiftWeChatHttpRequest(environ)
+        if isinstance(response_body, bool):
+            if response_body:
+                response_body = "true"
+            else:
+                response_body = "false"
+        else:
+            pass
     else:
         s = sql.db()
         response_body = s.showDBInfo()
