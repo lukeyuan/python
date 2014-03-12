@@ -6,6 +6,8 @@ import json
 import MySQLdb
 import pymongo
 
+from util import mongoChange, mysqlChange
+
 BASE_PATH = os.environ['OPENSHIFT_REPO_DIR'] + 'wsgi/dbinfo'
 
 class db():
@@ -21,24 +23,24 @@ class db():
                     f = f.split()
                     self.dbMsg[f[0]] = f[1]
             if self.dbMsg['DB'] == 'mysql':
-                self.dbInstance = mysql_db()
+                self.dbInstance = mysql_db(self.dbMsg)
             elif self.dbMsg['DB'] == 'mongodb':
-                self.dbInstance = mongo_db()
+                self.dbInstance = mongo_db(sel.dbMsg)
 
-    def select(self, table, criteria={}, fields={}):
-        pass
+    def select(self, table, criteria='', fields=[]):
+        return self.dbInstance.select(table, criteria, fields)
 
     def insert(self, table, keys_values):
-        pass
+        return self.dbInstance.insert(table, keys_values)
 
     def insert_all(self, json_content):
-        pass
+        return self.dbInstance.insert_all(json_content)
 
-    def delete(self, table, criteria):
-        pass
+    def delete(self, table, criteria=''):
+        return self.dbInstance.delete(table, criteria)
 
-    def update(self, table, modify, criteria):
-        pass
+    def update(self, table, modify, criteria=''):
+        return self.dbInstance.update(table, modify, criteria)
 
     def create(self, table, items_types, notnull=[], default={}, auto_increment=[], privatekey = None):
         if dbInstance:
@@ -130,17 +132,28 @@ class mysql_db:
             self.cur.executemany(insertTpl, data)
             self.conn.commit()
             return True
-        except KeyError, IndexError, TypeError:
+        except Exception, ex:
             return False
-        pass
 
-    def select(self, table, criteria={}, fields={}):
+    def select(self, table, criteria='', fields=[]):
         query = ''
-        if criteria:
-            query = "SELECT * FROM %s" % table
-        else:
-            pass
-        pass
+        try:
+            if not criteria and not fields:
+                query = "SELECT * FROM %s" % table
+            elif not criteria and fields:
+                query = "SELECT %s FROM %s" % (','.join(fields), table)
+            elif criteria and not fields:
+                query = "SELECT * FROM %s WHERE %s" % (table, mysqlChange(criteria))
+            else:
+                query = "SELECT %s FROM %s WHERE %s" % (','.join(fields), table, mysqlChange(criteria))
+            try:
+                self.cur.execute(query)
+                self.conn.commit()
+                return self.cur.fetchall()
+            except MySQLdb.Error, e:
+                return False
+        except Exception, ex:
+            return False
 
     def drop(self, table):
         dropTpl = "DROP TABLE %s" % table
@@ -148,14 +161,41 @@ class mysql_db:
             self.cur.execute(dropTpl)
             self.conn.commit()
             return True
-        except MySQLdb, e:
+        except MySQLdb.Error, e:
             return False
 
-    def delete(self, criteria):
-        pass
+    def delete(self, table, criteria):
+        delTpl = ""
+        try:
+            if criteria:
+                delTpl = "DELETE FROM %s WHERE %s " % (table, mysqlChange(criteria))
+            else:
+                delTpl = "DELETE FROM %s " % table
+            try:
+                self.cur.execute(delTpl)
+                self.conn.commit()
+            except MySQLdb.Error, e:
+                return False
+        except Exception,ex:
+            return False
 
     def update(self, table, modify, criteria):
-        pass
+        updateTpl = ""
+        tmpList = []
+        for k,v in modify:
+            tmpList.append("%s=%r" %(k,v))
+        try:
+            if criteria:
+                updateTpl = "UPDATE %s SET %s WHERE %s" % (table, ','.join(tmpList), mysqlChange(criteria))
+            else:
+                updateTpl = "UPDATE %s SET %s" % (table, ','.join(tmpList))
+            try:
+                self.cur.execute(updateTpl)
+                self.conn.commit()
+            except MySQLdb.Error, e:
+                return False
+        except Exception,ex :
+            return False
 
     def __del__(self):
         if cur:
@@ -164,6 +204,99 @@ class mysql_db:
             conn.close()
 
 class mongo_db:
-    def __init__():
-        pass
-    pass
+    conn = ''
+    db = ''
+    def __init__(self, dbMsg):
+        self.conn = pymongo.Connection(dbMsg['OPENSHIFT_MONGODB_DB_HOST'], 27017)
+        self.db = conn[os.environ['OPENSHIFT_APP_NAME']]
+        self.db.authenticate(dbMsg['OPENSHIFT_MONGO_DB_USERNAME'], dbMsg['OPENSHIFT_MONGODB_DB_PASSWORD'])
+    
+    def create(self, table, items_types, notnull=[], default={}, auto_increment=[], privatekey = None):
+        #mongo不需要创建表
+        return True
+
+    def insert(self, table, keys_values):
+        try:
+            self.db[table].insert(keys_values)
+            return True
+        except Exception,ex:
+            return False
+
+    def insert_all(self, json_content):
+        try:
+            json_content = json.loads(json_content)
+        except Exception,ex:
+            return False
+        table = json_content['table']
+        data = json_content['data']
+        keys = data.pop(0)
+        insertList = []
+        for l in data:
+            tempDict = {}
+            for k,v in zip(keys,l):
+                tempDict[k] = v
+            insertList.append(tempDict)
+        try:
+            self.db[table].insert(insertList)
+            return True
+        except Exception,ex:
+            return False
+
+    def select(self, table, criteria=""):
+        if criteria:
+            return self.db[table].find()
+        else:
+            condition = mongoChange(criteria)
+            if condition:
+                try:
+                    return self.db[table].find(json.loads(condition))
+                except Exception,ex:
+                    return False
+            else:
+                return False
+
+    def drop(self, table):
+        try:
+            db[table].drop()
+            return True
+        except Exception,ex:
+            return False
+
+    def delete(self, table, criteria=""):
+        if criteria:
+            self.db[table].remove()
+            return True
+        else:
+            condition = mongoChange(criteria)
+            if condition:
+                try:
+                    self.db[table].remove(json.loads(condition))
+                    return True
+                except Exception,ex:
+                    return False
+            else:
+                return False
+
+    def update(self, table, modify, criteria=""):
+        tempDict = {}
+        for k,v in modify:
+            tempDict[k] = v
+        if criteria:
+            condition = mongoChange(criteria)
+            if condition:
+                try:
+                    self.db[table].update(json.loads(condition), {"set": tempDict}, multi = True)
+                    return True
+                except Exception,ex:
+                    return False
+            else:
+                return False
+        else:
+            try:
+                self.db[table].update({}, {"$set": tempDict}, multi = True)
+                return True
+            except Exception,ex:
+                return False
+
+    def __del__():
+        db.logout()
