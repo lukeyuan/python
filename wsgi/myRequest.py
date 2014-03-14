@@ -30,9 +30,9 @@ def OpenshiftHttpRequest(environ):
             fields = cgi.FieldStorage(fp=environ['wsgi.input'], environ=environ, keep_blank_values=1)
             for index in fields:
                 if fields[index].filename == None: #POST数据变量
-                    para[field[index].name] = field[index].value
+                    para[fields[index].name] = fields[index].value
                 elif fields[index].filename: #POST数据文件
-                    para[field[index].name] = {'name': fields[index].filename, 'value': fields[index].value}
+                    para[fields[index].name] = {'name': fields[index].filename, 'value': fields[index].value}
          
     except Exception,ex:
         return Exception,":",ex
@@ -44,12 +44,13 @@ def OpenshiftHttpRequest(environ):
                 result = function(para)
                 try:
                     ret = json.dumps(result['AppText'])
+                    return ret
                 except Exception,ex:
                     return "JSON format error"
-    if para:
-        return str(para)
-    else:
-        return "no logic , no para"
+    #if para:
+    #    return str(para)
+    #else:
+    #    return "no logic , no para"
 
 def OpenshiftWeChatHttpRequest(environ):
     TOKEN = "xiaodangding"
@@ -60,7 +61,7 @@ def OpenshiftWeChatHttpRequest(environ):
             if para:
                 signature = para['signature']
                 timestamp = para['timestamp']
-                nonce = pata['nonce']
+                nonce = para['nonce']
                 token = TOKEN
                 tmpArr = [token, timestamp, nonce]
                 tmpArr.sort()
@@ -108,6 +109,12 @@ def OpenshiftWeChatHttpRequest(environ):
             return ' '.join(["错误：",Exception,":",ex])
     return "WeChatOK"
 
+def InsertData(environ):
+    fields = cgi.FieldStorage(fp=environ['wsgi.input'], environ=environ, keep_blank_values=1)
+    if fields.value:
+        pass #TODO
+    return "ok"
+
 def _getGETPara(environ, para):
     try:
         if "QUERY_STRING" in environ and environ['QUERY_STRING']:
@@ -117,6 +124,8 @@ def _getGETPara(environ, para):
                 k = k.split("=")
                 para[k[0]] = k[1]
             return para
+        else:
+            return {}
     except Exception, ex:
         return {}
 

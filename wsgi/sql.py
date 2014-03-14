@@ -49,7 +49,7 @@ class db():
             return False
 
     def drop(self, table):
-        pass
+        return dbInstance.drop(table)
 
 
     def showDBInfo(self):
@@ -198,10 +198,10 @@ class mysql_db:
             return False
 
     def __del__(self):
-        if cur:
-            cur.close()
-        if conn:
-            conn.close()
+        if self.cur:
+            self.cur.close()
+        if self.conn:
+            self.conn.close()
 
 class mongo_db:
     conn = ''
@@ -249,7 +249,11 @@ class mongo_db:
             condition = mongoChange(criteria)
             if condition:
                 try:
-                    return self.db[table].find(json.loads(condition))
+                    cur =  self.db[table].find(json.loads(condition))
+                    tempList = []
+                    for r in cur:
+                        tempList.append(r)
+                    return tuple(tempList)
                 except Exception,ex:
                     return False
             else:
@@ -257,7 +261,7 @@ class mongo_db:
 
     def drop(self, table):
         try:
-            db[table].drop()
+            self.db[table].drop()
             return True
         except Exception,ex:
             return False
@@ -299,4 +303,4 @@ class mongo_db:
                 return False
 
     def __del__():
-        db.logout()
+        self.db.logout()

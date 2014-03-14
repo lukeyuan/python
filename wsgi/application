@@ -27,7 +27,7 @@ def application(environ, start_response):
         response_body = '\n'.join(response_body)
     elif environ['PATH_INFO'] == '/OpenshiftHttpRequest':
         response_body = myRequest.OpenshiftHttpRequest(environ)
-        if not isinstance(response_body, ""):
+        if not isinstance(response_body, str):
             response_body = str(response_body)
     elif environ['PATH_INFO'] == '/OpenshiftWeChatHttpRequest':
         response_body = myRequest.OpenshiftWeChatHttpRequest(environ)
@@ -36,8 +36,10 @@ def application(environ, start_response):
                 response_body = "true"
             else:
                 response_body = "false"
-        elif not isinstance(response_body, ""):
+        elif not isinstance(response_body, str):
             response_body = str(response_body)
+    elif environ['PATH_INFO'] == '/insertData':
+        response_body = myRequest.InsertData(environ)
     else:
         s = sql.db()
         response_body = s.showDBInfo()
