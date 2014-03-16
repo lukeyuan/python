@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 #-*-coding:utf-8-*-
 
+import re
+
 def priority(n):
     if  n == ')':
         return 4
@@ -109,7 +111,10 @@ def mongoChange(string):
 
         #print listOpr
         #print listValue
-        return listValue[0]#返回最后结果
+        value = listValue[0]#返回最后结果
+        value = re.sub(r"(,?)(\w+?)\s+?:", r"\1'\2' :", value) #变为符合json格式规范
+        value = value,replace("'", "\"")
+        return value
     except Exception,ex:
         return False #Exception,": ",ex
 

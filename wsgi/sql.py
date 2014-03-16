@@ -24,8 +24,8 @@ class db():
                     self.dbMsg[f[0]] = f[1]
             if self.dbMsg['DB'] == 'mysql':
                 self.dbInstance = mysql_db(self.dbMsg)
-            elif self.dbMsg['DB'] == 'mongodb':
-                self.dbInstance = mongo_db(sel.dbMsg)
+            elif self.dbMsg['DB'] == 'mongo':
+                self.dbInstance = mongo_db(self.dbMsg)
 
     def select(self, table, criteria='', fields=[]):
         return self.dbInstance.select(table, criteria, fields)
@@ -43,8 +43,8 @@ class db():
         return self.dbInstance.update(table, modify, criteria)
 
     def create(self, table, items_types, notnull=[], default={}, auto_increment=[], privatekey = None):
-        if dbInstance:
-            return dbInstance.create(table, items_types, notnull, default, auto_increment, privatekey)
+        if self.dbInstance:
+            return self.dbInstance.create(table, items_types, notnull, default, auto_increment, privatekey)
         else:
             return False
 
@@ -208,8 +208,8 @@ class mongo_db:
     db = ''
     def __init__(self, dbMsg):
         self.conn = pymongo.Connection(dbMsg['OPENSHIFT_MONGODB_DB_HOST'], 27017)
-        self.db = conn[os.environ['OPENSHIFT_APP_NAME']]
-        self.db.authenticate(dbMsg['OPENSHIFT_MONGO_DB_USERNAME'], dbMsg['OPENSHIFT_MONGODB_DB_PASSWORD'])
+        self.db = self.conn[os.environ['OPENSHIFT_APP_NAME']]
+        self.db.authenticate(dbMsg['OPENSHIFT_MONGODB_DB_USERNAME'], dbMsg['OPENSHIFT_MONGODB_DB_PASSWORD'])
     
     def create(self, table, items_types, notnull=[], default={}, auto_increment=[], privatekey = None):
         #mongo不需要创建表
@@ -242,9 +242,13 @@ class mongo_db:
         except Exception,ex:
             return False
 
-    def select(self, table, criteria=""):
-        if criteria:
-            return self.db[table].find()
+    def select(self, table, criteria="", fields=[]):
+        if not criteria:
+            cur = self.db[table].find()
+            tempList = []
+            for r in cur:
+                tempList.append(r)
+            return tuple(tempList)
         else:
             condition = mongoChange(criteria)
             if condition:
@@ -267,7 +271,7 @@ class mongo_db:
             return False
 
     def delete(self, table, criteria=""):
-        if criteria:
+        if not criteria:
             self.db[table].remove()
             return True
         else:

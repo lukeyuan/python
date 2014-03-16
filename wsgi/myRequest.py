@@ -39,14 +39,16 @@ def OpenshiftHttpRequest(environ):
     if 'logic' in globals():
         if "method" in para:
             method = para['method']
-            if callable(getattr(logic, method)):
-                function = getattr(logic, method)
+            if callable(getattr(logic.logic(), method)):
+                function = getattr(logic.logic(), method)
                 result = function(para)
                 try:
                     ret = json.dumps(result['AppText'])
                     return ret
                 except Exception,ex:
-                    return "JSON format error"
+                    ret = str(result['AppText'])
+                    return ret
+                    #return "JSON format error"
     #if para:
     #    return str(para)
     #else:
@@ -88,8 +90,8 @@ def OpenshiftWeChatHttpRequest(environ):
                             if n.nodeType in (n.TEXT_NODE, n.CDATA_SECTION_NODE):
                                 para[node.nodeName] = n.data
             if 'logic' in globals():
-                if callable(getattr(logic, "all")):
-                    function = getattr(logic, "all")
+                if callable(getattr(logic.logic(), "all")):
+                    function = getattr(logic.logic(), "all")
                     result = function(para)
                     textTpl = '''<?xml version='1.0' encoding='utf-8' ?>
                     <xml>
