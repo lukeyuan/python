@@ -18,7 +18,7 @@ except ImportError:
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
-def OpenshiftHttpRequest(environ):
+def openshiftHttpRequest(environ):
     para = {}
     para = _getGETPara(environ, para)
     try:
@@ -54,7 +54,7 @@ def OpenshiftHttpRequest(environ):
     #else:
     #    return "no logic , no para"
 
-def OpenshiftWeChatHttpRequest(environ):
+def openshiftWeChatHttpRequest(environ):
     TOKEN = "xiaodangding"
     para = {}
     if environ['REQUEST_METHOD'] == "GET":#微信认证
@@ -111,11 +111,31 @@ def OpenshiftWeChatHttpRequest(environ):
             return ' '.join(["错误：",Exception,":",ex])
     return "WeChatOK"
 
-def InsertData(environ):
+def insertData(environ):
     fields = cgi.FieldStorage(fp=environ['wsgi.input'], environ=environ, keep_blank_values=1)
     if fields.value:
-        pass #TODO
-    return "ok"
+        value = fields.value
+        db = sql.db()
+        result = db.insert_all(value)
+        if result:
+            return "插入成功"
+        else:
+            return "插入失败"
+    else:
+        return "没有数据"
+
+def createTable(environ):
+    fields = cgi.FieldStorage(fp=environ['wsgi.input'], environ=environ, keep_blank_values=1)
+    try:
+        createSQL = fields['createSQL'].value
+        db = sql.db()
+        r = db.rawsql(createSQL)
+        if r:
+            return True
+        else:
+            return False
+    except Exception,ex:
+        return False
 
 def _getGETPara(environ, para):
     try:

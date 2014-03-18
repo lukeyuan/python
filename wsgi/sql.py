@@ -51,6 +51,11 @@ class db():
     def drop(self, table):
         return dbInstance.drop(table)
 
+    def rawsql(self, sqlstr):
+        if self.dbMsg['DB'] = 'mysql':
+            return rawsql(sqlstr)
+        else:
+            return False
 
     def showDBInfo(self):
         if self.dbMsg:
@@ -68,6 +73,14 @@ class mysql_db:
                 port=3306)
         self.cur = self.conn.cursor()
         self.conn.select_db(os.environ['OPENSHIFT_APP_NAME'])
+
+    def rawsql(self, sqlstr):
+        try:
+            self.cur.execute(sqlstr)
+            self.conn.commit()
+            return True
+        except Exception,ex:
+            return False
 
     def create(self, table, items_types, notnull=[], default={}, auto_increment=[], privatekey = None):
         '''
@@ -119,7 +132,7 @@ class mysql_db:
         else:
             return False
 
-    def insert_all(json_content):
+    def insert_all(self, json_content):
         try:
             json_content = json.loads(json_content)
         except Exception, e:
@@ -128,7 +141,9 @@ class mysql_db:
             table = json_content['table']
             data = json_content['data']
             keys = data.pop(0)
-            insertTpl = "INSERT INTO %s ( %s ) values " % (table, ','.join(keys)) + " ( %s ) "
+            n = len(keys)
+            valueList = ["%s"] * n
+            insertTpl = "INSERT INTO %s ( %s ) values " % (table, ','.join(keys)) + ''.join(['( ', ','.join(valueList), ' )'])
             self.cur.executemany(insertTpl, data)
             self.conn.commit()
             return True

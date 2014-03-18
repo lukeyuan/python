@@ -26,27 +26,25 @@ def application(environ, start_response):
                 for key, value in sorted(environ.items())]
         response_body = '\n'.join(response_body)
     elif environ['PATH_INFO'] == '/OpenshiftHttpRequest':
-        response_body = myRequest.OpenshiftHttpRequest(environ)
-        if not isinstance(response_body, str):
-            response_body = str(response_body)
+        response_body = myRequest.openshiftHttpRequest(environ)
     elif environ['PATH_INFO'] == '/OpenshiftWeChatHttpRequest':
-        response_body = myRequest.OpenshiftWeChatHttpRequest(environ)
+        response_body = myRequest.openshiftWeChatHttpRequest(environ)
         if isinstance(response_body, bool):
             if response_body:
                 response_body = "true"
             else:
                 response_body = "false"
-        elif not isinstance(response_body, str):
-            response_body = str(response_body)
     elif environ['PATH_INFO'] == '/insertData':
-        response_body = myRequest.InsertData(environ)
+        response_body = myRequest.insertData(environ)
+    elif environ['PATH_INFO'] == '/createTable':
+        response_body = myRequest.createTable(environ)
     else:
         s = sql.db()
         response_body = s.showDBInfo()
-        if response_body:
-            response_body = str(response_body)
-        else:
+        if not response_body:
             response_body = "nothing output"
+    if not isinstance(response_body, str):
+        response_body = str(response_body)
     status = '200 OK'
     response_headers = [('Content-Type', ctype), ('Content-Length', str(len(response_body)))]
 
