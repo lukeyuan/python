@@ -42,9 +42,9 @@ class db():
     def update(self, table, modify, criteria=''):
         return self.dbInstance.update(table, modify, criteria)
 
-    def create(self, table, items_types, notnull=[], default={}, auto_increment=[], primarykey = None):
+    def create(self, table, items_types, notnull=[], default={}, auto_increment=[], privatekey = None):
         if self.dbInstance:
-            return self.dbInstance.create(table, items_types, notnull, default, auto_increment, primarykey)
+            return self.dbInstance.create(table, items_types, notnull, default, auto_increment, privatekey)
         else:
             return False
 
@@ -82,7 +82,7 @@ class mysql_db:
         except Exception,ex:
             return False
 
-    def create(self, table, items_types, notnull=[], default={}, auto_increment=[], primarykey = None):
+    def create(self, table, items_types, notnull=[], default={}, auto_increment=[], privatekey = None):
         '''
         mysql建立表
         table 表名字
@@ -90,23 +90,20 @@ class mysql_db:
         notnull 列表类型，为非空的值
         default 字典类型，某变量的默认值
         auto_increment 列表类型，自增的变量
-        primarykey 主键
+        privatekey 主键
         '''
-        createTpl = "CREATE TABLE IF NOT EXISTS %s (%s)"
+        createTpl = "CREATE TABLE %s (%s)"
         para = []
         for k,v in items_types:#遍历创建的量
             templi = [k, v]
             if k in notnull:
                 templi.append("NOT NULL")
             if k in default.keys():
-                if default[k] == 'NULL':
-                    templi.append("DEFAULT NULL")
-                else:
-                    templi.append("DEFAULT %r" % default[k])#字符串自带''
+                templi.append("DEFAULT %r" % default[k])#字符串自带''
             if k in auto_increment:
                 templi.append("AUTO_INCREMENT")
-            if primarykey and k == primarykey:
-                templi.append("PRIMARY KEY")
+            if privatekey and k == privatekey:
+                templi.append("PRIVATE KEY")
             para.append(' '.join(templi))#以一个空格分隔上述变量，存入para
         string = ','.join(para) #组装为创建条件
         string = createTpl % (table, string)#完整的sql语句
@@ -192,7 +189,6 @@ class mysql_db:
             try:
                 self.cur.execute(delTpl)
                 self.conn.commit()
-                return True
             except MySQLdb.Error, e:
                 return False
         except Exception,ex:
@@ -211,7 +207,6 @@ class mysql_db:
             try:
                 self.cur.execute(updateTpl)
                 self.conn.commit()
-                return True
             except MySQLdb.Error, e:
                 return False
         except Exception,ex :
@@ -326,5 +321,5 @@ class mongo_db:
             except Exception,ex:
                 return False
 
-    def __del__(self):
+    def __del__():
         self.db.logout()
