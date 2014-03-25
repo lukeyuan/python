@@ -33,7 +33,7 @@ class stateMachine:
         default = {'state': 'NULL'}
         autoIncrement = ['id']
         primarykey = 'id'
-        self.db.create(table, items, notnull, default
+        self.db.create(self.table, items, notnull, default
                 , autoIncrement, primarykey)
         
     def add_edge(self, e_from, e_to, pattern_string):
@@ -47,7 +47,7 @@ class stateMachine:
             self.head[e_from] = 'null'
         self.edgeTo[self.ecnt] = e_to
         self.weight[self.ecnt] = pattern_string
-        self.nxt[self.cnt] = self.head[e_from]
+        self.nxt[self.ecnt] = self.head[e_from]
         self.head[e_from] = self.ecnt
         self.ecnt += 1
 
@@ -152,7 +152,7 @@ class stateMachine:
             r = result[0]
             userJson = r[0]
             userJsonContent = json.loads(userJson)
-            if useJsonContent['fa'] == {} :
+            if userJsonContent['fa'] == {} :
                 return False
             userJson = json.dumps({"state": userJsonContent['fa']['state'],
                 "select": userJsonContent['fa']['select'],

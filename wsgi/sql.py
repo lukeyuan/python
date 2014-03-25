@@ -52,7 +52,7 @@ class db():
         return dbInstance.drop(table)
 
     def rawsql(self, sqlstr):
-        if self.dbMsg['DB'] = 'mysql':
+        if self.dbMsg['DB'] == 'mysql':
             return rawsql(sqlstr)
         else:
             return False
@@ -94,7 +94,7 @@ class mysql_db:
         '''
         createTpl = "CREATE TABLE IF NOT EXISTS %s (%s)"
         para = []
-        for k,v in items_types:#遍历创建的量
+        for k,v in items_types.items():#遍历创建的量
             templi = [k, v]
             if k in notnull:
                 templi.append("NOT NULL")
@@ -122,10 +122,13 @@ class mysql_db:
         mysql插入数据
         keys_values 字典类型，变量：值 对
         '''
-        if isinstance(keys_values, {}) and keys_values:#空值判断
-            insertTpl = "INSERT INTO %s ( %s ) VALUES ( %r )" % \
-                    (','.join(keys_values.keys()),
-                            ','.join(keys_values.values()))
+        if isinstance(keys_values, dict) and keys_values:#空值判断
+            tempList = []
+            for i in keys_values.values():
+                tempList.append('%r' % i )
+            insertTpl = "INSERT INTO %s ( %s ) VALUES ( %s )" % \
+                    (table, ','.join(keys_values.keys()),
+                            ','.join(tempList)))
             try:
                 self.cur.execute(insertTpl)
                 self.conn.commit()
@@ -164,10 +167,22 @@ class mysql_db:
                 query = "SELECT * FROM %s WHERE %s" % (table, mysqlChange(criteria))
             else:
                 query = "SELECT %s FROM %s WHERE %s" % (','.join(fields), table, mysqlChange(criteria))
+            if not fields:
+                tempList = []
+                subquery = "SHOW COLUMNS FROM %s " % table
+                self.cur.execute(subquery)
+                r = self.cur.fetchall()
+                for i in r:
+                    tempList.append(i[0])
             try:
                 self.cur.execute(query)
                 self.conn.commit()
-                return self.cur.fetchall()
+                r = self.cur.fetchall()
+                if r and not fields:
+                    r = list(r)
+                    r.insert(0, tuple(tempList))
+                    r = tuple(r)
+                return r
             except MySQLdb.Error, e:
                 return False
         except Exception, ex:
@@ -201,7 +216,7 @@ class mysql_db:
     def update(self, table, modify, criteria):
         updateTpl = ""
         tmpList = []
-        for k,v in modify:
+        for k,v in modify.items():
             tmpList.append("%s=%r" %(k,v))
         try:
             if criteria:
