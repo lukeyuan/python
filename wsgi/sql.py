@@ -123,7 +123,7 @@ class mysql_db:
         keys_values 字典类型，变量：值 对
         '''
         if isinstance(keys_values, {}) and keys_values:#空值判断
-            insertTpl = "INSERT INTO %s ( %s ) VALUES ( %s )" % \
+            insertTpl = "INSERT INTO %s ( %s ) VALUES ( %r )" % \
                     (','.join(keys_values.keys()),
                             ','.join(keys_values.values()))
             try:
