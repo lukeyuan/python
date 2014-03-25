@@ -128,7 +128,7 @@ class mysql_db:
                 tempList.append('%r' % i )
             insertTpl = "INSERT INTO %s ( %s ) VALUES ( %s )" % \
                     (table, ','.join(keys_values.keys()),
-                            ','.join(tempList)))
+                            ','.join(tempList))
             try:
                 self.cur.execute(insertTpl)
                 self.conn.commit()
