@@ -93,17 +93,41 @@ def openshiftWeChatHttpRequest(environ):
                 if callable(getattr(logic.logic(), "all")):
                     function = getattr(logic.logic(), "all")
                     result = function(para)
-                    textTpl = '''<?xml version='1.0' encoding='utf-8' ?>
-                    <xml>
-                     <ToUserName>%s</ToUserName>
-                     <fromUserName>%s</FromUserName>
-                     <CreateTime>%s</CreateTime>
-                     <MsgType>%s</MsgType>
-                     <Content>%s</Content>
-                    </xml>
-                    '''
-                    resultStr = textTpl % (para["FromUserName"], para['ToUserName'], time.time(), result["MsgType"], result["content"])
-                    return resultStr
+                    if result['MsgType'] == 'text':
+                        textTpl = '''<?xml version='1.0' encoding='utf-8' ?>
+                        <xml>
+                            <ToUserName>%s</ToUserName>
+                            <FromUserName>%s</FromUserName>
+                            <CreateTime>%s</CreateTime>
+                            <MsgType>%s</MsgType>
+                            <Content>%s</Content>
+                        </xml>
+                        '''
+                        resultStr = textTpl % (para["FromUserName"], para['ToUserName'], time.time(), result["MsgType"], result["content"])
+                        return resultStr
+                    else result['MsgType'] == 'news':
+                        newsTpl = '''<?xml version='1.0' encoding='utf-8' ?>
+                        <xml>
+                            <ToUserName>%s</ToUserName>
+                            <FromUserName>%s</FromUserName>
+                            <CreateTime>%s</CreateTime>
+                            <MsgType>%s</MsgType>
+                            <ArticleCount>%s<ArticleCount>
+                            <Articles>
+                                %s
+                            </Articles>
+                        </xml>
+                        '''
+                        articleCount = int(result['ArticleCount'])
+                        tpl = '''<item>
+                            <Title>%s</Title>
+                            <Description>%s</Description>
+                            <PicUrl>%s</PicUrl>
+                        </item>
+                        '''
+                        tplList = []
+                        for i in range(1, articleCount+1):
+                            pass
             else:
                 return "no logic in wx"
 

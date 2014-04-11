@@ -113,7 +113,7 @@ def mongoChange(string):
         #print listValue
         value = listValue[0]#返回最后结果
         value = re.sub(r"(,?)(\w+?)\s+?:", r"\1'\2' :", value) #变为符合json格式规范
-        value = value,replace("'", "\"")
+        value = value.replace("'", "\"")
         return value
     except Exception,ex:
         return False #Exception,": ",ex
