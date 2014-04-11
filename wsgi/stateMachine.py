@@ -55,6 +55,7 @@ class stateMachine:
         '''
         判断指定用户是否能通过select,到达target_state
         '''
+        user = str(user)
         curState = self.get_state(user)
         if curState not in self.head:
             self.head[curState] = 'null'
@@ -72,6 +73,7 @@ class stateMachine:
         '''
         用户根据选择到达下一状态
         '''
+        user = str(user)
         curState = self.get_state(user)
         if curState not in self.head:
             self.head[curState] = 'null'
@@ -97,6 +99,7 @@ class stateMachine:
         '''
         获取用户状态
         '''
+        user = str(user)
         result = self.db.select(self.table, 'username == %r' % user, ['state'])
         if not result:#用户不存在
             self.create_userstate(user)
@@ -111,6 +114,7 @@ class stateMachine:
         '''
         获取用户的选择（当前）
         '''
+        user = str(user)
         result = self.db.select(self.table, 'username == %r' % user, ['state'])
         if not result:#用户不存在
             self.create_userstate(user)
@@ -130,6 +134,7 @@ class stateMachine:
         '''
         保存用户状态
         '''
+        user = str(user)
         result = self.db.select(self.table, 'username == %r' % user, ['state'])
         if not result:
             return self.create_userstate(user)
@@ -145,6 +150,7 @@ class stateMachine:
         '''
         回滚用户到上一状态
         '''
+        user = str(user)
         result = self.db.select(self.table, "username = %r" % user, ['state'])
         if not result:
             return self.create_userstate(user)
@@ -161,6 +167,7 @@ class stateMachine:
             return result
 
     def create_userstate(self, user):
+        user = str(user)
         userJson = json.dumps({"state": "null", "select": "null", "fa": {}})
         dic = {"username": user, "state": userJson}
         r = self.db.insert(self.table, dic)

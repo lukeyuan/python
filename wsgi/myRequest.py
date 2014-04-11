@@ -71,7 +71,7 @@ def openshiftWeChatHttpRequest(environ):
                 m = hashlib.sha1()
                 m.update(tmpStr)
                 if m.hexdigest() == signature:
-                    return True
+                    return para['echostr']
                 else:
                     return False
             else:
@@ -105,7 +105,7 @@ def openshiftWeChatHttpRequest(environ):
                         '''
                         resultStr = textTpl % (para["FromUserName"], para['ToUserName'], time.time(), result["MsgType"], result["content"])
                         return resultStr
-                    else result['MsgType'] == 'news':
+                    elif result['MsgType'] == 'news':
                         newsTpl = '''<?xml version='1.0' encoding='utf-8' ?>
                         <xml>
                             <ToUserName>%s</ToUserName>

@@ -125,6 +125,8 @@ class mysql_db:
         if isinstance(keys_values, dict) and keys_values:#空值判断
             tempList = []
             for i in keys_values.values():
+                if isinstance(i, unicode):
+                    i = str(i)
                 tempList.append('%r' % i )
             insertTpl = "INSERT INTO %s ( %s ) VALUES ( %s )" % \
                     (table, ','.join(keys_values.keys()),
@@ -217,6 +219,8 @@ class mysql_db:
         updateTpl = ""
         tmpList = []
         for k,v in modify.items():
+            if isinstance(v, unicode):
+                v = str(v)
             tmpList.append("%s=%r" %(k,v))
         try:
             if criteria:
