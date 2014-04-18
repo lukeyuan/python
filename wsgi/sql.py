@@ -49,11 +49,11 @@ class db():
             return False
 
     def drop(self, table):
-        return dbInstance.drop(table)
+        return self.dbInstance.drop(table)
 
     def rawsql(self, sqlstr):
         if self.dbMsg['DB'] == 'mysql':
-            return rawsql(sqlstr)
+            return self.dbInstance.rawsql(sqlstr)
         else:
             return False
 
