@@ -103,7 +103,7 @@ def openshiftWeChatHttpRequest(environ):
                             <Content>%s</Content>
                         </xml>
                         '''
-                        resultStr = textTpl % (para["FromUserName"], para['ToUserName'], time.time(), result["MsgType"], result["content"])
+                        resultStr = textTpl % (para["FromUserName"], para['ToUserName'], time.time(), result["MsgType"], result["Content"])
                         return resultStr
                     elif result['MsgType'] == 'news':
                         newsTpl = '''<?xml version='1.0' encoding='utf-8' ?>

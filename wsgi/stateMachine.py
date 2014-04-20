@@ -71,7 +71,7 @@ class stateMachine:
 
     def go_with(self, user, select):
         '''
-        用户根据选择到达下一状态
+        用户能否根据选择到达下一状态
         '''
         user = str(user)
         curState = self.get_state(user)
@@ -100,7 +100,7 @@ class stateMachine:
         获取用户状态
         '''
         user = str(user)
-        result = self.db.select(self.table, 'username == %r' % user, ['state'])
+        result = self.db.select(self.table, "username == '%s'" % user, ['state'])
         if not result:#用户不存在
             self.create_userstate(user)
             return 'null'
@@ -115,7 +115,7 @@ class stateMachine:
         获取用户的选择（当前）
         '''
         user = str(user)
-        result = self.db.select(self.table, 'username == %r' % user, ['state'])
+        result = self.db.select(self.table, "username == '%s'" % user, ['state'])
         if not result:#用户不存在
             self.create_userstate(user)
             return 'null'
@@ -135,13 +135,15 @@ class stateMachine:
         保存用户状态
         '''
         user = str(user)
-        result = self.db.select(self.table, 'username == %r' % user, ['state'])
+        result = self.db.select(self.table, "username == '%s'" % user, ['state'])
         if not result:
             return self.create_userstate(user)
         else:
             r = result[0]
             userJson = r[0]
             userJsonContent = json.loads(userJson)
+            if len(userJson) > 990:
+                userJsonContent['fa']['fa'] = {} #清空后
             userJson = json.dumps({"state": state, "select": select, "fa": userJsonContent})
             result = self.db.update(self.table, {"state": userJson}, "username == %r" % user)
             return result
@@ -151,7 +153,7 @@ class stateMachine:
         回滚用户到上一状态
         '''
         user = str(user)
-        result = self.db.select(self.table, "username = %r" % user, ['state'])
+        result = self.db.select(self.table, "username = '%s'" % user, ['state'])
         if not result:
             return self.create_userstate(user)
         else:
