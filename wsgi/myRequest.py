@@ -55,7 +55,7 @@ def openshiftHttpRequest(environ):
     #    return "no logic , no para"
 
 def openshiftWeChatHttpRequest(environ):
-    TOKEN = "xiaodangding"
+    TOKEN = "weixin"
     para = {}
     if environ['REQUEST_METHOD'] == "GET":#微信认证
         para = _getGETPara(environ, para)
@@ -132,7 +132,7 @@ def openshiftWeChatHttpRequest(environ):
                 return "no logic in wx"
 
         except Exception, ex:
-            return ' '.join(["错误：",Exception,":",ex])
+            return ' '.join(["错误：",str(Exception),":",str(ex)])
     return "WeChatOK"
 
 def insertData(environ):

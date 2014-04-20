@@ -127,7 +127,10 @@ class mysql_db:
             for i in keys_values.values():
                 if isinstance(i, unicode):
                     i = str(i)
-                tempList.append('%r' % i )
+                if isinstancei(i, str):
+                    tempList.append("'%s'" % i )
+                else:
+                    tempList.append("%r" % i)
             insertTpl = "INSERT INTO %s ( %s ) VALUES ( %s )" % \
                     (table, ','.join(keys_values.keys()),
                             ','.join(tempList))
@@ -221,7 +224,10 @@ class mysql_db:
         for k,v in modify.items():
             if isinstance(v, unicode):
                 v = str(v)
-            tmpList.append("%s=%r" %(k,v))
+            if isinstance(v, str):
+                tmpList.append("%s='%s'" %(k,v))
+            else:
+                tmpList.append("%s=%r" %(k,v))
         try:
             if criteria:
                 updateTpl = "UPDATE %s SET %s WHERE %s" % (table, ','.join(tmpList), mysqlChange(criteria))
