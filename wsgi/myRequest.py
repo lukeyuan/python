@@ -142,7 +142,7 @@ def insertData(environ):
         db = sql.db()
         result = db.insert_all(value)
         if result:
-            return "插入成功"
+            return True#"插入成功"
         else:
             return "插入失败"
     else:
