@@ -172,22 +172,26 @@ class mysql_db:
                 query = "SELECT * FROM %s WHERE %s" % (table, mysqlChange(criteria))
             else:
                 query = "SELECT %s FROM %s WHERE %s" % (','.join(fields), table, mysqlChange(criteria))
+            tempList = []
             if not fields:
-                tempList = []
                 subquery = "SHOW COLUMNS FROM %s " % table
                 self.cur.execute(subquery)
-                r = self.cur.fetchall()
+                r = self.cur.fetchone()
                 for i in r:
                     tempList.append(i[0])
+            else:
+                tempList = fields
             try:
                 self.cur.execute(query)
                 self.conn.commit()
-                r = self.cur.fetchall()
-                if r and not fields:
-                    r = list(r)
-                    r.insert(0, tuple(tempList))
-                    r = tuple(r)
-                return r
+                rr = self.cur.fetchall()
+                result = []
+                for r in rr:
+                    tempDic = {}
+                    for i, t in enumerate(tempList):
+                        tempDic[t] = r[i]
+                    result.append(tempDic)
+                return tuple(result)
             except MySQLdb.Error, e:
                 return False
         except Exception, ex:
