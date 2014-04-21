@@ -70,7 +70,8 @@ class mysql_db:
         self.conn = MySQLdb.connect(host=dbMsg['OPENSHIFT_MYSQL_DB_HOST'],
                 user=dbMsg['OPENSHIFT_MYSQL_DB_USERNAME'],
                 passwd=dbMsg['OPENSHIFT_MYSQL_DB_PASSWORD'],
-                port=3306)
+                port=3306,
+                charset="utf8")
         self.cur = self.conn.cursor()
         self.conn.select_db(os.environ['OPENSHIFT_APP_NAME'])
 
