@@ -106,7 +106,7 @@ class stateMachine:
             return 'null'
         else:
             r = result[0]
-            userJson = r[0]
+            userJson = r['state']
             userJsonContent = json.loads(userJson)
             return userJsonContent['state']
 
@@ -121,13 +121,13 @@ class stateMachine:
             return 'null'
         else:
             r = result[0]
-            userJson = r[0]
+            userJson = r['state']
             userJsonContent = json.loads(userJson)
             return userJsonContent['select']
     
     def reset_userstate(self, user):
         userJson = json.dumps({"state": "null", "select": "null", "fa": {}})
-        result = self.db.update(self.table, {"state": userJson}, "username = %r " % user)
+        result = self.db.update(self.table, {"state": userJson}, "username = '%s' " % user)
         return result
 
     def save_state(self, user, state, select):
@@ -140,12 +140,12 @@ class stateMachine:
             return self.create_userstate(user)
         else:
             r = result[0]
-            userJson = r[0]
+            userJson = r['state']
             userJsonContent = json.loads(userJson)
             if len(userJson) > 990:
                 userJsonContent['fa']['fa'] = {} #清空后
             userJson = json.dumps({"state": state, "select": select, "fa": userJsonContent})
-            result = self.db.update(self.table, {"state": userJson}, "username == %r" % user)
+            result = self.db.update(self.table, {"state": userJson}, "username == '%s'" % user)
             return result
 
     def rollback(self, user):
@@ -158,14 +158,14 @@ class stateMachine:
             return self.create_userstate(user)
         else:
             r = result[0]
-            userJson = r[0]
+            userJson = r['state']
             userJsonContent = json.loads(userJson)
             if userJsonContent['fa'] == {} :
                 return False
             userJson = json.dumps({"state": userJsonContent['fa']['state'],
                 "select": userJsonContent['fa']['select'],
                 "fa": userJsonContent['fa']['fa'] })
-            result = self.db.update(self.table, {"state": userJson}, "username == %r" % user)
+            result = self.db.update(self.table, {"state": userJson}, "username == '%s'" % user)
             return result
 
     def create_userstate(self, user):
@@ -178,3 +178,6 @@ class stateMachine:
         else:
             return False
 
+    def debug(self, s):
+        with open(os.environ['OPENSHIFT_REPO_DIR']+'wsgi/testSM', 'ab') as f:
+            f.write(str(s))
