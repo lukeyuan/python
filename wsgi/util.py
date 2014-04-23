@@ -72,7 +72,7 @@ def mongoChange(string):
                     else:#处理&&,||     > < = != >= <=
                         value = listValue.pop()
                         key = listValue.pop()
-                        tmp = exchangeDict[tempOpr] % (key, value)
+                        tmp = exchangeDict[tempOpr] % (str(key), str(value))
                         listValue.append(tmp)
                         listOpr.append(l)
                 else:
@@ -106,7 +106,7 @@ def mongoChange(string):
             else:
                 value = listValue.pop()
                 key = listValue.pop()
-                tmp = exchangeDict[tempOpr] % (key, value)
+                tmp = exchangeDict[tempOpr] % (str(key), str(value))
                 listValue.append(tmp)
 
         #print listOpr
