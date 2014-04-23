@@ -128,7 +128,7 @@ class mysql_db:
             for i in keys_values.values():
                 if isinstance(i, unicode):
                     i = str(i)
-                if isinstancei(i, str):
+                if isinstance(i, str):
                     tempList.append("'%s'" % i )
                 else:
                     tempList.append("%r" % i)
