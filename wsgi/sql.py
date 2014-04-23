@@ -336,14 +336,15 @@ class mongo_db:
                 return False
 
     def update(self, table, modify, criteria=""):
-        tempDict = {}
-        for k,v in modify:
-            tempDict[k] = v
+        #tempDict = {}
+        #for k,v in modify:
+        #    tempDict[k] = v
+        tempDict = modify
         if criteria:
             condition = mongoChange(criteria)
             if condition:
                 try:
-                    self.db[table].update(json.loads(condition), {"set": tempDict}, multi = True)
+                    self.db[table].update(json.loads(condition), {"$set": tempDict}, multi = True)
                     return True
                 except Exception,ex:
                     return False
